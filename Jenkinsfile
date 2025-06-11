@@ -91,6 +91,30 @@ pipeline {
                 }
             }
         }
+
+        stage('Quality Gate') {
+            steps {
+                echo 'Waiting for SonarCloud Quality Gate...'
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                script {
+                    def image = docker.build("${DOCKER_HUB_REPO}:${APP_VERSION}")
+                    
+                    sh "docker tag ${DOCKER_HUB_REPO}:${APP_VERSION} ${DOCKER_HUB_REPO}:latest"
+                    
+                    env.DOCKER_IMAGE = "${DOCKER_HUB_REPO}:${APP_VERSION}"
+                    
+                    echo "Built Docker image: ${env.DOCKER_IMAGE}"
+                }
+            }
+        }
         
     }
 }
