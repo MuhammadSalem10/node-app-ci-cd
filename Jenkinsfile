@@ -118,31 +118,19 @@ pipeline {
                 }
         }
 
-         stage('Login to Docker Hub') {
+          stage('Push the Image to Docker Hub') {
             steps {
-                script {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'dockerhub-credentials',
+                withCredentials([usernamePassword(
+                   credentialsId: 'dockerhub-credentials',
                         usernameVariable: 'DOCKERHUB_USERNAME',
                         passwordVariable: 'DOCKERHUB_PASSWORD'
-                    )]) {
-                        sh 'echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin'
-                    }
+                )]) {
+                    sh '''
+                        echo $PASS | docker login -u $USER --password-stdin
+                        docker push $DOCKER_IMAGE
+                        docker logout
+                    '''
                 }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    sh "docker push $DOCKER_IMAGE"
-                }
-            }
-        }
-
-        stage('Logout Docker') {
-            steps {
-                sh 'docker logout'
             }
         }
 
