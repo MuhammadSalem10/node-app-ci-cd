@@ -45,7 +45,7 @@
                 '''
             }
         }
-   }
+   
         stage('Run Tests') {
     steps {
         echo 'Running unit tests with coverage...'
@@ -70,6 +70,6 @@
         }
     }
 
-
+        }
 }
    }
