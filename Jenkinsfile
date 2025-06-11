@@ -34,4 +34,17 @@
             }
         }
    }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    echo "Node.js version: $(node --version)"
+                    echo "npm version: $(npm --version) 
+
+                    npm ci 
+
+                    npm list --depth=0
+                '''
+            }
+        }
    }
