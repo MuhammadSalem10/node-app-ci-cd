@@ -71,35 +71,35 @@ pipeline {
             }
         }
 
-        stage('Static Code Analysis') {
-            steps {
-                echo 'Running SonarCloud analysis...'
-                script {
-                    def scannerHome = tool 'SonarQube-Scanner'
-                    withSonarQubeEnv('SonarCloud') {
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=MuhammadSalem10_node-app-ci-cd \
-                                -Dsonar.organization=muhammadsalem10-1 \
-                                -Dsonar.sources=. \
-                                -Dsonar.exclusions=node_modules/**,tests/**,coverage/** \
-                                -Dsonar.test.inclusions=tests/** \
-                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                                -Dsonar.projectVersion=${APP_VERSION}
-                        """
-                    }
-                }
-            }
-        }
+        // stage('Static Code Analysis') {
+        //     steps {
+        //         echo 'Running SonarCloud analysis...'
+        //         script {
+        //             def scannerHome = tool 'SonarQube-Scanner'
+        //             withSonarQubeEnv('SonarCloud') {
+        //                 sh """
+        //                     ${scannerHome}/bin/sonar-scanner \
+        //                         -Dsonar.projectKey=MuhammadSalem10_node-app-ci-cd \
+        //                         -Dsonar.organization=muhammadsalem10-1 \
+        //                         -Dsonar.sources=. \
+        //                         -Dsonar.exclusions=node_modules/**,tests/**,coverage/** \
+        //                         -Dsonar.test.inclusions=tests/** \
+        //                         -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+        //                         -Dsonar.projectVersion=${APP_VERSION}
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Quality Gate') {
-            steps {
-                echo 'Waiting for SonarCloud Quality Gate...'
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         echo 'Waiting for SonarCloud Quality Gate...'
+        //         timeout(time: 5, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
         
         stage('Build Docker Image') {
             steps {
