@@ -105,16 +105,36 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 script {
-                    def image = docker.build("${DOCKER_HUB_REPO}:${APP_VERSION}")
-                    
-                    sh "docker tag ${DOCKER_HUB_REPO}:${APP_VERSION} ${DOCKER_HUB_REPO}:latest"
-                    
-                    env.DOCKER_IMAGE = "${DOCKER_HUB_REPO}:${APP_VERSION}"
-                    
-                    echo "Built Docker image: ${env.DOCKER_IMAGE}"
+                    try {
+                        def image = docker.build("${DOCKER_HUB_REPO}:${APP_VERSION}")
+                        sh "docker tag ${DOCKER_HUB_REPO}:${APP_VERSION} ${DOCKER_HUB_REPO}:latest"
+                        env.DOCKER_IMAGE = "${DOCKER_HUB_REPO}:${APP_VERSION}"
+                        echo "Built Docker image: ${env.DOCKER_IMAGE}"
+                    } catch (Exception e) {
+                        echo "Error during Docker build: ${e.message}"
+                        error "Failed to build Docker image"
+                        }
+                    }
                 }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                echo 'Pushing Docker image to Docker Hub...'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                        sh "docker push ${DOCKER_HUB_REPO}:${APP_VERSION}"
+                        
+                        sh "docker push ${DOCKER_HUB_REPO}:latest"
+                    }
+                }
+                
+                echo 'Docker image pushed successfully!'
             }
         }
+        
+   
+            
         
     }
 }
