@@ -57,7 +57,7 @@ pipeline {
             }
             post {
                 always {
-                     junit testResultsPattern: '**/test-results.xml'
+                     junit testResults: '**/test-results.xml'
 
                     publishHTML([
                         allowMissing: false,
