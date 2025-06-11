@@ -57,8 +57,8 @@ pipeline {
             }
             post {
                 always {
-                    publishTestResults testResultsPattern: 'coverage/lcov.info'
-                    
+                     junit testResultsPattern: '**/test-results.xml'
+
                     publishHTML([
                         allowMissing: false,
                         alwaysLinkToLastBuild: false,
