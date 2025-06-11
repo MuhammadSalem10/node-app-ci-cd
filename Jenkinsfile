@@ -4,7 +4,8 @@ pipeline {
     environment {
         DOCKER_HUB_REPO = 'mohamed079/my-node-app'
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')
-
+        DOCKER_HUB_PASS
+        DOCKER_HUB_USER = "mohamed079"
         SONAR_TOKEN = credentials('sonarcloud-token')
         SONAR_HOST_URL = 'https://sonarcloud.io'
 
@@ -122,6 +123,7 @@ pipeline {
             steps {
                 echo 'Pushing Docker image to Docker Hub...'
                 script {
+                      withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials')])
 
                     docker.withRegistry("https://registry.hub.docker.com", "dockerhub-credentials") {
                         sh "docker push ${DOCKER_HUB_REPO}:${APP_VERSION}"
