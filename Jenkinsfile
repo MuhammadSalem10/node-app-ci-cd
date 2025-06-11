@@ -118,59 +118,49 @@ pipeline {
                 }
         }
 
-          stage('Push the Image to Docker Hub') {
-            steps {
-              withCredentials([usernamePassword(
-                credentialsId: 'dockerhub-credentials',
-                usernameVariable: 'DOCKERHUB_USERNAME',
-                passwordVariable: 'DOCKERHUB_PASSWORD'
-              )]) {
-                sh '''
-                  echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-                  docker push mohamed079/my-node-app:${APP_VERSION}
-                  docker push mohamed079/my-node-app:latest
-                  docker logout
-                '''
-              }
-            }
-          }
-
-           stage('Deploy to Staging') {
-            steps {
-                echo 'Deploying to staging environment...'
-                script {
-                    sh '''
-                        docker stop my-app-staging || true
-                        docker rm my-app-staging || true
-                    '''
-                    
-                    sh """
-                        docker run -d \
-                            --name my-app-staging \
-                            -p ${STAGING_PORT}:3000 \
-                            -e NODE_ENV=staging \
-                            -e APP_VERSION=${APP_VERSION} \
-                            ${DOCKER_IMAGE}
-                    """
-                    
-                    sh """
-                        echo "Waiting for staging deployment to be ready..."
-                        timeout 60 bash -c 'until curl -f http://localhost:${STAGING_PORT}/health; do sleep 5; done'
-                    """
-                    
-                    echo "Staging deployment successful! Available at: http://localhost:${STAGING_PORT}"
-                }
-            }
-            post {
-                success {
-                    echo 'Staging deployment completed successfully!'
-                }
-                failure {
-                    echo 'Staging deployment failed!'
-                    sh 'docker logs my-app-staging || true'
-                }
-            }
+        stage('Deploy to Staging') {
+    steps {
+        echo 'Deploying to staging environment...'
+        script {
+            sh '''
+                docker stop my-app-staging || true
+                docker rm my-app-staging || true
+            '''
+            
+            sh """
+                docker run -d \
+                    --name my-app-staging \
+                    -p ${STAGING_PORT}:3000 \
+                    -e NODE_ENV=staging \
+                    -e APP_VERSION=${APP_VERSION} \
+                    ${DOCKER_IMAGE}
+            """
+            
+            sh """
+                echo "Waiting for staging deployment to be ready..."
+                timeout 60 bash -c '
+                    until docker exec my-app-staging curl -sf http://localhost:3000/health; do
+                        echo "Waiting for /health..."
+                        sleep 5
+                    done
+                '
+            """
+            
+            echo "Staging deployment successful! Available at: http://<EC2-PUBLIC-IP>:${STAGING_PORT}"
         }
+    }
+    post {
+        success {
+            echo 'Staging deployment completed successfully!'
+        }
+        failure {
+            echo 'Staging deployment failed!'
+            sh 'docker logs my-app-staging || true'
+        }
+    }
+}
+
+          
 
     }
 }
