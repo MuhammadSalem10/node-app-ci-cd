@@ -139,7 +139,7 @@ pipeline {
             sh """
                 echo "Waiting for staging deployment to be ready..."
                 timeout 60 bash -c '
-                    until docker exec my-app-staging curl -sf http://localhost:3000/health; do
+                    until docker exec my-app-staging wget -q --spider http://localhost:3000/health; do
                         echo "Waiting for /health..."
                         sleep 5
                     done
