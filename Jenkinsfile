@@ -120,19 +120,20 @@ pipeline {
 
           stage('Push the Image to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(
-                   credentialsId: 'dockerhub-credentials',
-                        usernameVariable: 'DOCKERHUB_USERNAME',
-                        passwordVariable: 'DOCKERHUB_PASSWORD'
-                )]) {
-                    sh '''
-                        echo $PASS | docker login -u $USER --password-stdin
-                        docker push $DOCKER_IMAGE
-                        docker logout
-                    '''
-                }
+              withCredentials([usernamePassword(
+                credentialsId: 'dockerhub-credentials',
+                usernameVariable: 'DOCKERHUB_USERNAME',
+                passwordVariable: 'DOCKERHUB_PASSWORD'
+              )]) {
+                sh '''
+                  echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+                  docker push mohamed079/my-node-app:${APP_VERSION}
+                  docker push mohamed079/my-node-app:latest
+                  docker logout
+                '''
+              }
             }
-        }
+          }
 
     }
 }
