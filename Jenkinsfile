@@ -155,10 +155,10 @@ pipeline {
                     
                     sh """
                         echo "Waiting for staging deployment to be ready..."
-                        timeout 60 bash -c 'until curl -f http://localhost:${STAGING_PORT}/health; do sleep 2; done'
+                        timeout 60 bash -c 'until curl -f http://http://35.171.193.195/:${STAGING_PORT}/health; do sleep 2; done'
                     """
                     
-                    echo "Staging deployment successful! Available at: http://localhost:${STAGING_PORT}"
+                    echo "Staging deployment successful! Available at: http://http://35.171.193.195/:${STAGING_PORT}"
                 }
             }
             post {
