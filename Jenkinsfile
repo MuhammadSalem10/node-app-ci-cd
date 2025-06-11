@@ -138,6 +138,7 @@ pipeline {
             
             sh """
                 echo "Waiting for staging deployment to be ready..."
+                sleep 5
                 timeout 60 bash -c '
                     until curl -f http://localhost:${STAGING_PORT}/health; do
                         echo "Waiting for /health..."
@@ -145,6 +146,7 @@ pipeline {
                     done
                 '
             """
+
             
             echo "Staging deployment successful! Available at: http://<EC2-PUBLIC-IP>:${STAGING_PORT}"
         }
