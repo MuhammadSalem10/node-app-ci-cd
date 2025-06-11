@@ -135,5 +135,42 @@ pipeline {
             }
           }
 
+           stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying to staging environment...'
+                script {
+                    sh '''
+                        docker stop my-app-staging || true
+                        docker rm my-app-staging || true
+                    '''
+                    
+                    sh """
+                        docker run -d \
+                            --name my-app-staging \
+                            -p ${STAGING_PORT}:3000 \
+                            -e NODE_ENV=staging \
+                            -e APP_VERSION=${APP_VERSION} \
+                            ${DOCKER_IMAGE}
+                    """
+                    
+                    sh """
+                        echo "Waiting for staging deployment to be ready..."
+                        timeout 60 bash -c 'until curl -f http://localhost:${STAGING_PORT}/health; do sleep 2; done'
+                    """
+                    
+                    echo "Staging deployment successful! Available at: http://localhost:${STAGING_PORT}"
+                }
+            }
+            post {
+                success {
+                    echo 'Staging deployment completed successfully!'
+                }
+                failure {
+                    echo 'Staging deployment failed!'
+                    sh 'docker logs my-app-staging || true'
+                }
+            }
+        }
+
     }
 }
