@@ -33,8 +33,6 @@
                 }
             }
         }
-   }
-
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -47,7 +45,7 @@
                 '''
             }
         }
-
+   }
         stage('Run Tests') {
     steps {
         echo 'Running unit tests with coverage...'
@@ -71,5 +69,7 @@
             ])
         }
     }
+
+
 }
    }
