@@ -53,7 +53,7 @@ app.post('/calculate', (req, res) => {
     res.json({ result });
 });
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
 
