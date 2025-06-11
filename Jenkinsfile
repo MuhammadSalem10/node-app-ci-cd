@@ -118,19 +118,31 @@ pipeline {
                 }
         }
 
-        stage('Push to Docker Hub') {
+         stage('Login to Docker Hub') {
             steps {
-                echo 'Pushing Docker image to Docker Hub...'
                 script {
-                      withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials')])
-
-                    docker.withRegistry("https://registry.hub.docker.com", "dockerhub-credentials") {
-                        sh "docker push ${DOCKER_HUB_REPO}:${APP_VERSION}"
-                        
-                        sh "docker push ${DOCKER_HUB_REPO}:latest"
+                    withCredentials([usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_PASSWORD'
+                    )]) {
+                        sh 'echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin'
                     }
-                     echo 'Docker image pushed successfully!'
                 }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    sh "docker push $DOCKER_IMAGE"
+                }
+            }
+        }
+
+        stage('Logout Docker') {
+            steps {
+                sh 'docker logout'
             }
         }
 
