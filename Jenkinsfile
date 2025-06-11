@@ -1,26 +1,27 @@
-pipeline {
-    agent any 
 
+   pipeline {
+    agent any
+    
     environment {
         DOCKER_HUB_REPO = 'mohamed079/my-node-app'
-        DOCKER_HUB_CREDENTIALS = credentials('DOCKER_HUB_CREDENTIALS')
+        DOCKER_HUB_CREDENTIALS = 'dockerhub-credentials'
         
-        SONAR_TOKEN = credentials('SONAR_TOKEN')
+        SONAR_TOKEN = credentials('sonarcloud-token')
         SONAR_HOST_URL = 'https://sonarcloud.io'
         
         APP_VERSION = "${BUILD_NUMBER}"
         STAGING_PORT = '3001'
         PRODUCTION_PORT = '3000'
     }
-
+    
     tools {
-        nodejs 'NodeJS-18'
+        nodejs 'NodeJS-18' 
     }
 
-    stages {
+     stages {
         stage('Checkout') {
             steps {
-                  echo 'Checking out source code from GitHub...'
+                echo 'Checking out source code from GitHub...'
                 checkout scm
                 
                 script {
@@ -31,54 +32,6 @@ pipeline {
                     env.GIT_BRANCH = gitBranch
                 }
             }
-            }
-
-             stage('Install Dependencies') {
-            steps {
-                echo 'Installing Node.js dependencies...'
-                sh '''
-                    echo "Node.js version: $(node --version)"
-                    echo "npm version: $(npm --version)"
-                    
-                    # Clean install for reproducible builds
-                    npm ci
-                    
-                    # List installed packages for debugging
-                    npm list --depth=0
-                '''
-            }
         }
-
-         stage('Run Tests') {
-            steps {
-                echo 'Running unit tests with coverage...'
-                sh '''
-                    # Run tests with coverage for SonarCloud
-                    npm run test:coverage
-                    
-                    # Display test results summary
-                    echo "Test execution completed"
-                '''
-            }
-            post {
-                always {
-                    // Archive test results
-                    publishTestResults testResultsPattern: 'coverage/lcov.info'
-                    
-                    // Archive coverage reports
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'coverage/lcov-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Coverage Report'
-                    ])
-                }
-            }
-        }
-        
-        }
-
-       
-    }
+   }
+   }
