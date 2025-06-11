@@ -47,4 +47,29 @@
                 '''
             }
         }
+
+        stage('Run Tests') {
+    steps {
+        echo 'Running unit tests with coverage...'
+        sh '''
+            npm run test:coverage
+
+            echo "Test execution completed"
+        '''
+    }
+    post {
+        always {
+            junit testResultsPattern: '**/test-results.xml' 
+
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'coverage/lcov-report', 
+                reportFiles: 'index.html',
+                reportName: 'Coverage Report'
+            ])
+        }
+    }
+}
    }
