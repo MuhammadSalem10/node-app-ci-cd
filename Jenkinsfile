@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_HUB_REPO = 'mohamed079/my-node-app'
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKER_HUB_PASS
         DOCKER_HUB_USER = "mohamed079"
         SONAR_TOKEN = credentials('sonarcloud-token')
         SONAR_HOST_URL = 'https://sonarcloud.io'
