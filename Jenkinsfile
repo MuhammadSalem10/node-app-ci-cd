@@ -14,6 +14,7 @@ pipeline {
     }
 
     tools {
+        git 'Default Git' 
         nodejs 'NodeJS-18'
     }
 
